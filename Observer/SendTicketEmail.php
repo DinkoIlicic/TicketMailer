@@ -65,6 +65,12 @@ class SendTicketEmail implements ObserverInterface
         $this->customerRepository = $customerRepository;
     }
 
+    /**
+     * Function checks if the module is enabled. Listens to the event. Creates email and sends it.
+     *
+     * @param Observer $observer
+     * @return void|null
+     */
     public function execute(Observer $observer)
     {
         if ($this->scopeConfig->getValue(
@@ -73,14 +79,22 @@ class SendTicketEmail implements ObserverInterface
         )) {
             try {
                 $test = $observer->getEvent()->getData('ticketData');
-                $subjectData = [TicketInterface::SUBJECT => $test[TicketInterface::SUBJECT], TicketInterface::MESSAGE => $test[TicketInterface::MESSAGE]];
+                $subjectData = [
+                    TicketInterface::SUBJECT => $test[TicketInterface::SUBJECT],
+                    TicketInterface::MESSAGE => $test[TicketInterface::MESSAGE]
+                ];
                 $customerId = $test[TicketInterface::CUSTOMER_ID];
                 $customer = $this->customerRepository->getById($customerId);
                 $sender = [
-                    'name' => $this->escaper->escapeHtml(ucfirst($customer->getFirstname()) . ' ' . ucfirst($customer->getLastname())),
+                    'name' => $this->escaper->escapeHtml(
+                        ucfirst($customer->getFirstname()) . ' ' . ucfirst($customer->getLastname())
+                    ),
                     'email' => $this->escaper->escapeHtml($customer->getEmail())
                 ];
-                $template = $this->scopeConfig->getValue('ticketMailer/email/email_template', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+                $template = $this->scopeConfig->getValue(
+                    'ticketMailer/email/email_template',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                );
                 $transport = $this->transportBuilder->setTemplateIdentifier($template)
                     ->setTemplateOptions(
                         ['area' => \Magento\Framework\App\Area::AREA_FRONTEND,
