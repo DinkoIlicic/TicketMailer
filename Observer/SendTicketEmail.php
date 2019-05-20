@@ -14,8 +14,6 @@ use Inchoo\Ticket\Api\Data\TicketInterface;
 
 class SendTicketEmail implements ObserverInterface
 {
-    const XML_PATH_EMAIL_RECIPIENT = 'trans_email/ident_general/email';
-
     /**
      * @var \Psr\Log\LoggerInterface
      */
