@@ -78,12 +78,12 @@ class SendTicketEmail implements ObserverInterface
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         )) {
             try {
-                $test = $observer->getEvent()->getData('ticketData');
+                $ticket = $observer->getEvent()->getData('ticketData');
                 $subjectData = [
-                    TicketInterface::SUBJECT => $test[TicketInterface::SUBJECT],
-                    TicketInterface::MESSAGE => $test[TicketInterface::MESSAGE]
+                    TicketInterface::SUBJECT => $ticket->getSubject(),
+                    TicketInterface::MESSAGE => $ticket->getMessage()
                 ];
-                $customerId = $test[TicketInterface::CUSTOMER_ID];
+                $customerId = $ticket->getCustomerId();
                 $customer = $this->customerRepository->getById($customerId);
                 $sender = [
                     'name' => $this->escaper->escapeHtml(
@@ -104,11 +104,12 @@ class SendTicketEmail implements ObserverInterface
                     ->setFromByScope($sender)
                     ->addTo($this->scopeConfig->getValue(
                         'ticketMailer/email/recipient_email',
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                    )
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ))
                     ->getTransport();
                 $transport->sendMessage();
             } catch (\Exception $exception) {
+                $errormsg = $exception->getMessage();
             }
         }
         return null;
