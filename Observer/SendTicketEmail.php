@@ -12,6 +12,10 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Inchoo\Ticket\Api\Data\TicketInterface;
 
+/**
+ * Class SendTicketEmail
+ * @package Inchoo\TicketMailer\Observer
+ */
 class SendTicketEmail implements ObserverInterface
 {
     /**
